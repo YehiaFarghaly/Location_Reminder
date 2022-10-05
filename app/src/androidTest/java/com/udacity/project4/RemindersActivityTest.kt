@@ -88,7 +88,7 @@ class RemindersActivityTest :
 
 
 //    TODO: add End to End testing to the app
-
+// Test the error message from the snack bar
     @Test
     fun testSnackBar_Error() {
         val scenario = ActivityScenario.launch(RemindersActivity::class.java)
@@ -105,6 +105,8 @@ class RemindersActivityTest :
             .check(matches(withText(R.string.err_select_location)))
         scenario.close()
     }
+    
+    // Test the Toast message when saving a reminder
 
     @Test
     fun saveReminder_showToast_Test(){
