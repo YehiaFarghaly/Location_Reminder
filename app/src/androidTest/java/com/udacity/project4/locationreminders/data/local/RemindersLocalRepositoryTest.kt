@@ -39,6 +39,8 @@ class RemindersLocalRepositoryTest {
              ).build()
         repository= RemindersLocalRepository(database.reminderDao())
     }
+    
+    // Test searching for an existing reminder in the database
     @ExperimentalCoroutinesApi
     @Test
    fun getRemindersWithID_found(){
@@ -50,6 +52,8 @@ class RemindersLocalRepositoryTest {
            assertThat(item.data ,`is` (reminderItem))
        }
    }
+   
+   // Test searching for a non existing reminder in the database
         @ExperimentalCoroutinesApi
         @Test
     fun getReminderWithWrongID_notFound(){
@@ -61,7 +65,7 @@ class RemindersLocalRepositoryTest {
             assertThat(item.message,`is`("Reminder not found!"))
         }
     }
-
+// test deleting all reminders in the database
     @ExperimentalCoroutinesApi
     @Test
     fun deleteAll_emptyListFound(){
