@@ -47,7 +47,7 @@ class RemindersListViewModelTest {
             10.0
         )
     }
-
+// Test the loading animation displayed time
     @Test
     fun check_loading() {
         mainCoroutineRule.runBlockingTest {
@@ -59,7 +59,7 @@ class RemindersListViewModelTest {
             assertThat(viewModel.showLoading.value, `is`(false))
         }
     }
-
+// Test saving a reminder in the database but with error
     @Test
     fun callLoadReminders_shouldReturnError(){
         mainCoroutineRule.runBlockingTest {
@@ -69,7 +69,7 @@ class RemindersListViewModelTest {
             assertThat(viewModel.showSnackBar.value,`is`("No Reminders"))
         }
     }
-
+// Test saving a reminder in the database
     @Test
     fun callLoadReminders_shouldReturnSuccess(){
         mainCoroutineRule.runBlockingTest {
