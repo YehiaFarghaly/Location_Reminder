@@ -49,7 +49,7 @@ class SaveReminderViewModelTest {
         )
     }
 
-
+// Test the loading animation time
     @Test
     fun check_loading() {
         mainCoroutineRule.runBlockingTest {
@@ -62,6 +62,8 @@ class SaveReminderViewModelTest {
             assertThat(viewModel.showLoading.value, `is`(false))
         }
     }
+    
+    // Test saving a reminder successfully
     @Test
     fun saveReminder_found() {
         val testReminder =
