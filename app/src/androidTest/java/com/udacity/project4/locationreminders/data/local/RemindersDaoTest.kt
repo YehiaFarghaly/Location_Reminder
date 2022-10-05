@@ -38,7 +38,7 @@ class RemindersDaoTest {
             RemindersDatabase::class.java
         ).build()
     }
-
+// Test inserting a reminder to the database then getting it using its ID
     @Test
     fun insertReminderAndGetById() {
         runBlockingTest {
