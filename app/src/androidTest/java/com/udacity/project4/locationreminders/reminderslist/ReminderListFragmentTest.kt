@@ -65,7 +65,7 @@ class ReminderListFragmentTest {
             modules(listOf(myModule))
         }
     }
-
+//    TODO: test the displayed data on the UI.
     @Test
     fun displayFragmentUI() {
         runBlockingTest {
@@ -77,6 +77,7 @@ class ReminderListFragmentTest {
             onView(withText(reminderDTO.description)).check(matches(isDisplayed()))
         }
     }
+    //    TODO: test the navigation of the fragments.
     @Test
     fun navigationToSaveReminderFragment() {
         runBlockingTest {
@@ -92,7 +93,6 @@ class ReminderListFragmentTest {
 
     @After
     fun stop() = stopKoin()
-//    TODO: test the navigation of the fragments.
-//    TODO: test the displayed data on the UI.
-//    TODO: add testing for the error messages.
+
+
 }
