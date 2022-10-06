@@ -9,25 +9,17 @@ import java.lang.Exception
 class FakeDataSource(var tasks:MutableList<ReminderDTO>?= mutableListOf()) : ReminderDataSource {
 
     private var shouldReturnError=false
-//    TODO: Create a fake data source to act as a double to the real data source
-
-//    override suspend fun getReminders(): Result<List<ReminderDTO>> {
-//        if(shouldReturnError) throw Exception("No Reminders")
-//        tasks?.let { return Result.Success(ArrayList(it)) }
-//        return Result.Error(
-//            "tasks not found"
-//        )
-//    }
-override suspend fun getReminders(): Result<List<ReminderDTO>> {
-    try {
-        if(shouldReturnError) {
-            throw Exception("No Reminders")
+    //    TODO: Create a fake data source to act as a double to the real data source
+    override suspend fun getReminders(): Result<List<ReminderDTO>> {
+        try {
+            if(shouldReturnError) {
+                throw Exception()
+            }
+            return Result.Success(ArrayList(tasks))
+        } catch (ex: Exception) {
+            return Result.Error(ex.localizedMessage)
         }
-       return Result.Success(ArrayList(tasks))
-    } catch (ex: Exception) {
-       return Result.Error(ex.localizedMessage)
     }
-}
     fun setShouldReturnError(flag:Boolean) {
         shouldReturnError=flag
     }
@@ -37,21 +29,20 @@ override suspend fun getReminders(): Result<List<ReminderDTO>> {
     }
 
     override suspend fun getReminder(id: String): Result<ReminderDTO> {
-        if(shouldReturnError) throw Exception("No such item")
-        tasks?.let {
-           val reminder = it.find {
-                it.id==id
+        try{
+            val reminder = tasks?.find { it.id==id }
+            if(reminder==null || shouldReturnError){
+                throw Exception()
             }
-            return if(reminder==null) Result.Error("no such item")
-            else Result.Success(reminder)
+            else return Result.Success(reminder)
         }
-        return Result.Error(
-            "tasks not found"
-        )
+        catch (exception:Exception){
+            return Result.Error(exception.localizedMessage)
+        }
     }
 
     override suspend fun deleteAllReminders() {
-       tasks?.clear()
+        tasks?.clear()
     }
 
 
