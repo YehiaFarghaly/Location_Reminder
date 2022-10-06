@@ -1,8 +1,4 @@
-package com.udacity.project4.locationreminders.data.local
-
-import com.udacity.project4.locationreminders.data.ReminderDataSource
-
-
+package com.udacity.project4.locationreminders.data
 
 import com.google.android.gms.common.api.ResultTransform
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
@@ -13,19 +9,11 @@ import java.lang.Exception
 class FakeDataSource(var tasks:MutableList<ReminderDTO>?= mutableListOf()) : ReminderDataSource {
 
     private var shouldReturnError=false
-//    TODO: Create a fake data source to act as a double to the real data source
-
-    //    override suspend fun getReminders(): Result<List<ReminderDTO>> {
-//        if(shouldReturnError) throw Exception("No Reminders")
-//        tasks?.let { return Result.Success(ArrayList(it)) }
-//        return Result.Error(
-//            "tasks not found"
-//        )
-//    }
+    //    TODO: Create a fake data source to act as a double to the real data source
     override suspend fun getReminders(): Result<List<ReminderDTO>> {
         try {
             if(shouldReturnError) {
-                throw Exception("No Reminders")
+                throw Exception()
             }
             return Result.Success(ArrayList(tasks))
         } catch (ex: Exception) {
@@ -41,17 +29,16 @@ class FakeDataSource(var tasks:MutableList<ReminderDTO>?= mutableListOf()) : Rem
     }
 
     override suspend fun getReminder(id: String): Result<ReminderDTO> {
-        if(shouldReturnError) throw Exception("No such item")
-        tasks?.let {
-            val reminder = it.find {
-                it.id==id
+        try{
+            val reminder = tasks?.find { it.id==id }
+            if(reminder==null || shouldReturnError){
+                throw Exception()
             }
-            return if(reminder==null) Result.Error("no such item")
-            else Result.Success(reminder)
+            else return Result.Success(reminder)
         }
-        return Result.Error(
-            "tasks not found"
-        )
+        catch (exception:Exception){
+            return Result.Error(exception.localizedMessage)
+        }
     }
 
     override suspend fun deleteAllReminders() {
