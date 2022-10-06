@@ -2,10 +2,14 @@ package com.udacity.project4
 
 
 import android.app.Application
+import androidx.core.content.MimeTypeFilter.matches
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.ViewAssertion
 import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -18,8 +22,11 @@ import com.udacity.project4.locationreminders.data.local.LocalDB
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.reminderslist.RemindersListViewModel
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
+import com.udacity.project4.util.DataBindingIdlingResource
+import com.udacity.project4.util.monitorActivity
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -31,6 +38,8 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
 import org.koin.test.get
+import org.mockito.ArgumentMatchers.matches
+import java.util.regex.Pattern.matches
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -42,6 +51,7 @@ class RemindersActivityTest :
     private lateinit var appContext: Application
     private lateinit var remindersActivity: RemindersActivity
     private lateinit var viewModel: SaveReminderViewModel
+    private val dataBindingIdlingResource = DataBindingIdlingResource()
 
     @get:Rule
     var activityTestRule: ActivityTestRule<RemindersActivity> =
@@ -83,15 +93,16 @@ class RemindersActivityTest :
             repository.deleteAllReminders()
         }
         viewModel = GlobalContext.get().koin.get()
-
+        IdlingRegistry.getInstance().register(dataBindingIdlingResource)
     }
 
 
 //    TODO: add End to End testing to the app
-// Test the error message from the snack bar
+// Test Snackbar showing error message
     @Test
     fun testSnackBar_Error() {
         val scenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(scenario)
         onView(withId(R.id.noDataTextView))
             .check(matches(isDisplayed()))
         onView(withId(R.id.addReminderFAB)).perform(click())
@@ -105,12 +116,11 @@ class RemindersActivityTest :
             .check(matches(withText(R.string.err_select_location)))
         scenario.close()
     }
-    
-    // Test the Toast message when saving a reminder
-
+// Test Toast showing save message
     @Test
     fun saveReminder_showToast_Test(){
         val scenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(scenario)
         onView(withId(R.id.noDataTextView)).check(matches(isDisplayed()))
         onView(withId(R.id.addReminderFAB)).perform(click())
         onView(withId(R.id.reminderTitle)).perform(replaceText("Title"))
@@ -120,12 +130,17 @@ class RemindersActivityTest :
         onView(withId(R.id.map)).perform(longClick())
         onView(withId(R.id.save_btn)).perform(click())
         onView(withId(R.id.saveReminder)).perform(click())
-        onView(withText(R.string.reminder_saved))
-            .inRoot(RootMatchers.withDecorView(CoreMatchers.
-            not(remindersActivity.window.decorView))).check(
-                matches(isDisplayed())
+        onView(withText(R.string.reminder_saved)).check(
+            ViewAssertions.matches(
+                isDisplayed()
             )
+        )
         scenario.close()
+    }
+
+    @After
+    fun close(){
+        IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
     }
 
 }
