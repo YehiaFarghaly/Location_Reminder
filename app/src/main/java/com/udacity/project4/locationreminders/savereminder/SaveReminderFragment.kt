@@ -3,6 +3,7 @@ package com.udacity.project4.locationreminders.savereminder
 import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
+import android.app.Activity
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.IntentSender
@@ -80,7 +81,7 @@ class SaveReminderFragment : BaseFragment() {
             val latitude = _viewModel.latitude.value
             val longitude = _viewModel.longitude.value
             remindDataItem = ReminderDataItem(title, description, location, latitude, longitude)
-            if(_viewModel.validateEnteredData(remindDataItem)) {
+            if (_viewModel.validateEnteredData(remindDataItem)) {
                 if (foregroundAndBackgroundLocationPermissionApproved()) {
                     checkDeviceLocationSettingsAndStartGeofence()
                 } else {
@@ -165,6 +166,7 @@ class SaveReminderFragment : BaseFragment() {
             "SaveReminderFragment.LocationReminder.action.ACTION_GEOFENCE_EVENT"
     }
 
+
     private fun checkDeviceLocationSettingsAndStartGeofence(resolve: Boolean = true) {
         val locationRequest = LocationRequest.create().apply {
             priority = LocationRequest.PRIORITY_LOW_POWER
@@ -176,12 +178,13 @@ class SaveReminderFragment : BaseFragment() {
         locationSettingsResponseTask.addOnFailureListener { exception ->
             if (exception is ResolvableApiException && resolve) {
                 try {
-                    exception.startResolutionForResult(
-                        requireActivity(),
-                        REQUEST_TURN_DEVICE_LOCATION_ON
+                    startIntentSenderForResult(
+                        exception.resolution.intentSender,
+                        REQUEST_TURN_DEVICE_LOCATION_ON,
+                        null, 0, 0, 0,
+                        null
                     )
                 } catch (sendEx: IntentSender.SendIntentException) {
-                    Log.d(TAG, "Error getting location settings resolution: " + sendEx.message)
                 }
             } else {
                 Snackbar.make(
@@ -219,6 +222,19 @@ class SaveReminderFragment : BaseFragment() {
             }
         }
 
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_TURN_DEVICE_LOCATION_ON) {
+            if (resultCode == Activity.RESULT_OK) {
+                addGeofenceReminder()
+            } else{
+                checkDeviceLocationSettingsAndStartGeofence(false)
+            }
+
+        }
     }
 
     override fun onDestroy() {
