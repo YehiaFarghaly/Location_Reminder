@@ -128,7 +128,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback,
                 enableMyLocation()
             }
 
-        } else {
+         else {
             Snackbar.make(
                 binding.root.findViewById(R.id.location_layout),
                 R.string.permission_denied_explanation,
@@ -142,6 +142,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback,
                     })
                 }.show()
         }
+    }
     }
 
 
