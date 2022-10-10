@@ -66,20 +66,23 @@ class RemindersListViewModelTest {
             fakeDataSource.setShouldReturnError(true)
             fakeDataSource.saveReminder(reminderDTO)
             viewModel.loadReminders()
-            assertThat(viewModel.showSnackBar.value,`is`("No Reminders"))
+            assertThat(viewModel.showSnackBar.value,`is`("Error"))
         }
     }
-// Test saving a reminder in the database
+// Test saveReminder Method when inserting a reminder item in the fake data source
     @Test
-    fun callLoadReminders_shouldReturnSuccess(){
-        mainCoroutineRule.runBlockingTest {
-            fakeDataSource.setShouldReturnError(false)
-            fakeDataSource.saveReminder(reminderDTO)
-            viewModel.loadReminders()
-            assertThat(viewModel.showSnackBar.value,not("No Reminders"))
-        }
+    fun testLoadReminder_shouldFind() {
+    mainCoroutineRule.runBlockingTest {
+        fakeDataSource.saveReminder(reminderDTO)
+      viewModel.loadReminders()
+        val item = viewModel.remindersList.value!!.get(0)
+        assertThat(item.title,`is`("title"))
+        assertThat(item.description,`is`("description"))
+        assertThat(item.location,`is`("location"))
+        assertThat(item.longitude,`is`(10.0))
+        assertThat(item.latitude,`is`(5.0))
     }
-
+}
 
 
     @After
