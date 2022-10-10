@@ -3,6 +3,7 @@ package com.udacity.project4.locationreminders.savereminder
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.udacity.project4.R
 import com.udacity.project4.locationreminders.data.FakeDataSource
 import com.udacity.project4.locationreminders.reminderslist.MainCoroutineRule
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
@@ -40,8 +41,8 @@ class SaveReminderViewModelTest {
             "title",
             "description",
             "location",
-            5.00,
-            10.00
+            5.0,
+            10.0
         )
         viewModel = SaveReminderViewModel(
             ApplicationProvider.getApplicationContext(),
@@ -61,6 +62,14 @@ class SaveReminderViewModelTest {
             mainCoroutineRule.resumeDispatcher()
             assertThat(viewModel.showLoading.value, `is`(false))
         }
+    }
+// Test validateAndSaveReminder Method when inserting a reminder with null location
+    @Test
+    fun testSaveReminder_LocationNull_ShouldReturnError(){
+        viewModel.validateAndSaveReminder(ReminderDataItem("title","description",null,5.0,10.0))
+        val snackBarMessage=viewModel.showSnackBarInt.value
+        assertThat(snackBarMessage,`is`(R.string.err_select_location))
+        assertThat(fakeDataSource.tasks!!.size,`is`(0))
     }
     
     // Test saving a reminder successfully
